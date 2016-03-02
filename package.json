@@ -31,6 +31,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/lgalfaso/angular-dynamic-locale.git"
+    "url": "git://github.com/gubab/angular-dynamic-locale.git"
   }
 }
