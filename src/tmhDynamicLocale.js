@@ -37,62 +37,11 @@ angular.module('tmh.dynamicLocale', []).config(['$provide', function($provide) {
     promiseCache = {},
     activeLocale;
 
-  /**
-   * Loads a script asynchronously
-   *
-   * @param {string} url The url for the script
-   @ @param {function} callback A function to be called once the script is loaded
-   */
-  function loadScript(url, callback, errorCallback, $timeout) {
-    var script = document.createElement('script'),
-      element = nodeToAppend ? nodeToAppend : document.getElementsByTagName("body")[0],
-      removed = false;
-
-    script.type = 'text/javascript';
-    if (script.readyState) { // IE
-      script.onreadystatechange = function () {
-        if (script.readyState === 'complete' ||
-            script.readyState === 'loaded') {
-          script.onreadystatechange = null;
-          $timeout(
-            function () {
-              if (removed) return;
-              removed = true;
-              element.removeChild(script);
-              callback();
-            }, 30, false);
-        }
-      };
-    } else { // Others
-      script.onload = function () {
-        if (removed) return;
-        removed = true;
-        element.removeChild(script);
-        callback();
-      };
-      script.onerror = function () {
-        if (removed) return;
-        removed = true;
-        element.removeChild(script);
-        errorCallback();
-      };
-    }
-    script.src = url;
-    script.async = true;
-    element.appendChild(script);
+  function loadScript(locale, callback) {
+    window.setAngularLocale(locale);
+    return callback();
   }
 
-  /**
-   * Loads a locale and replaces the properties from the current locale with the new locale information
-   *
-   * @param {string} localeUrl The path to the new locale
-   * @param {Object} $locale The locale at the curent scope
-   * @param {string} localeId The locale id to load
-   * @param {Object} $rootScope The application $rootScope
-   * @param {Object} $q The application $q
-   * @param {Object} localeCache The current locale cache
-   * @param {Object} $timeout The application $timeout
-   */
   function loadLocale(localeUrl, $locale, localeId, $rootScope, $q, localeCache, $timeout) {
 
     function overrideValues(oldObject, newObject) {
@@ -139,7 +88,7 @@ angular.module('tmh.dynamicLocale', []).config(['$provide', function($provide) {
     } else {
       activeLocale = localeId;
       promiseCache[localeId] = deferred.promise;
-      loadScript(localeUrl, function() {
+      loadScript(localeId, function() {
         // Create a new injector with the new locale
         var localInjector = angular.injector(['ngLocale']),
           externalLocale = localInjector.get('$locale');
